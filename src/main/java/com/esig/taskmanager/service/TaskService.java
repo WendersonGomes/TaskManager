@@ -34,8 +34,8 @@ public class TaskService {
         return taskDAO.findAll();
     }
 
-    public List<Task> filter(String title, String responsible, Task.Status status) {
-        return taskDAO.filter(title, responsible, status);
+    public List<Task> filter(String title, String responsible, String description, Task.Status status) {
+        return taskDAO.filter(title, responsible, description, status);
     }
 
     public void deleteCompleted() {
