@@ -48,18 +48,22 @@ public class TaskDAO {
         return entityManager.createQuery("SELECT t FROM Task t", Task.class).getResultList();
     }
 
-    public List<Task> filter(String title, String responsible, Task.Status status) {
+    public List<Task> filter(String title, String responsible, String description, Task.Status status) {
         String jpql = "SELECT t FROM Task t WHERE " +
                 "(:title IS NULL OR t.title LIKE :title) AND " +
                 "(:responsible IS NULL OR t.responsible LIKE :responsible) AND " +
+                "(:description IS NULL OR t.title LIKE :description OR t.description LIKE :description) AND " +
                 "(:status IS NULL OR t.status = :status)";
 
         return entityManager.createQuery(jpql, Task.class)
                 .setParameter("title", title == null ? null : "%" + title + "%")
                 .setParameter("responsible", responsible == null ? null : "%" + responsible + "%")
+                .setParameter("description", description == null ? null : "%" + description + "%")
                 .setParameter("status", status)
                 .getResultList();
     }
+
+
 
     public void deleteCompleted() {
         entityManager.getTransaction().begin();
