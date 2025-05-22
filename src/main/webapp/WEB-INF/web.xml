@@ -4,11 +4,6 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
          version="6.0">
 
-    <!-- Página padrão -->
-    <welcome-file-list>
-        <welcome-file>index.xhtml</welcome-file>
-    </welcome-file-list>
-
     <!-- Configuração do Faces Servlet -->
     <servlet>
         <servlet-name>FacesServlet</servlet-name>
@@ -20,5 +15,10 @@
         <servlet-name>FacesServlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
+
+    <!-- Página padrão -->
+    <welcome-file-list>
+        <welcome-file>index.xhtml</welcome-file>
+    </welcome-file-list>
 
 </web-app>
