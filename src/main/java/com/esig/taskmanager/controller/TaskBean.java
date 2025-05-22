@@ -1,3 +1,4 @@
+// TaskBean.java
 package com.esig.taskmanager.controller;
 
 import com.esig.taskmanager.model.Task;
@@ -28,20 +29,26 @@ public class TaskBean implements Serializable {
     private List<Task> taskList;
     private List<String> responsibleList;
 
+    private Integer filterId;
     private String filterTitle;
     private String filterResponsible;
+    private String filterDescription;
     private Task.Status filterStatus;
 
     private boolean editing = false;
 
     @PostConstruct
     public void init() {
-        taskList = taskService.findAll();
+        refreshTaskList();
         responsibleList = List.of("John", "Maria", "Carlos", "Anna");
     }
 
     public List<Task.Priority> getPriorities() {
         return List.of(Task.Priority.values());
+    }
+
+    public List<Task.Status> getStatusList() {
+        return List.of(Task.Status.values());
     }
 
     public void save() {
@@ -56,33 +63,20 @@ public class TaskBean implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
 
         try {
-            // Validação simples manual (além do front-end)
-            if (task.getTitle() == null || task.getTitle().isBlank() ||
-                    task.getDescription() == null || task.getDescription().isBlank() ||
-                    task.getResponsible() == null || task.getResponsible().isBlank() ||
-                    task.getPriority() == null || task.getDeadLine() == null) {
-
+            if (isInvalidTask(task)) {
                 context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Todos os campos devem ser preenchidos.", null));
                 return;
             }
 
-            task.setStatus(Task.Status.PROGRESS); // status inicial
+            task.setStatus(Task.Status.PROGRESS);
             taskService.save(task);
 
-            context.getExternalContext().redirect("taskList.xhtml"); // redireciona após salvar
+            context.getExternalContext().redirect("taskList.xhtml");
 
         } catch (Exception e) {
-            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao cadastrar tarefa.", null));
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao cadastrar tarefa: " + e.getMessage(), null));
         }
     }
-
-    public String prepareCreate() {
-        this.task = new Task();
-        this.editing = false;
-        return "index.xhtml?faces-redirect=true";
-    }
-
-
 
     public void updateTask() {
         taskService.update(task);
@@ -94,6 +88,11 @@ public class TaskBean implements Serializable {
         }
     }
 
+    public String prepareCreate() {
+        this.task = new Task();
+        this.editing = false;
+        return "index.xhtml?faces-redirect=true";
+    }
 
     public String editTask(Task t) {
         this.task = t;
@@ -101,55 +100,68 @@ public class TaskBean implements Serializable {
         return "index.xhtml?faces-redirect=true";
     }
 
-    public void deleteTask(Task t) {
-        taskService.delete(t);
-        taskList = taskService.findAll();
-    }
-
     public String prepareEdit(int id) {
-        this.task = taskService.findById(id);  // busca a tarefa pelo id
+        this.task = taskService.findById(id);
         this.editing = true;
-        return "index.xhtml?faces-redirect=true"; // redireciona para a página do formulário
-    }
-
-
-    public void applyFilter() {
-        taskList = taskService.filter(filterTitle, filterResponsible, filterStatus);
-    }
-
-    public void clearCompletedTasks() {
-        taskService.deleteCompleted();
-        taskList = taskService.findAll();
-
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Tarefas concluídas removidas com sucesso.", null));
-    }
-
-
-    private void resetForm() {
-        this.task = new Task();
-        this.editing = false;
-        this.taskList = taskService.findAll();
-    }
-
-    public String resetFormAndRedirectToInitialPage() {
-        this.task = new Task();
-        this.editing = false;
         return "index.xhtml?faces-redirect=true";
     }
 
-    public String resetFormAndRedirectToTaskListPage() {
-        return "taskList.xhtml?faces-redirect=true";
-    }
-
-    public List<Task.Status> getStatusList() {
-        return List.of(Task.Status.values());
+    public void deleteTask(Task t) {
+        taskService.delete(t);
+        refreshTaskList();
     }
 
     public void completeTask(Task t) {
         t.setStatus(Task.Status.COMPLETE);
         taskService.update(t);
-        taskList = taskService.findAll();
+        refreshTaskList();
     }
 
+    public void applyFilter() {
+        if (filterId != null) {
+            Task result = taskService.findById(filterId);
+            taskList = result != null ? List.of(result) : List.of();
+        } else {
+            taskList = taskService.filter(filterTitle, filterResponsible, filterDescription, filterStatus);
+        }
+    }
+
+    public void clearCompletedTasks() {
+        taskService.deleteCompleted();
+        refreshTaskList();
+
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Tarefas concluídas removidas com sucesso.", null));
+    }
+
+    private boolean isInvalidTask(Task t) {
+        return t.getTitle() == null || t.getTitle().isBlank()
+                || t.getDescription() == null || t.getDescription().isBlank()
+                || t.getResponsible() == null || t.getResponsible().isBlank()
+                || t.getPriority() == null || t.getDeadLine() == null;
+    }
+
+    private void resetForm() {
+        this.task = new Task();
+        this.editing = false;
+        refreshTaskList();
+    }
+
+    public String resetFormAndRedirectToTaskListPage() {
+        // Limpa os filtros ou qualquer outra informação
+        this.filterId = null;
+        this.filterTitle = null;
+        this.filterResponsible = null;
+        this.filterStatus = null;
+
+        // Recarrega a lista se necessário
+        refreshTaskList();
+
+        // Redireciona para a própria página
+        return "taskList.xhtml?faces-redirect=true";
+    }
+
+    private void refreshTaskList() {
+        this.taskList = taskService.findAll();
+    }
 }
