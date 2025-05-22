@@ -1,29 +1,43 @@
 package com.esig.taskmanager.dao;
 
 import com.esig.taskmanager.model.Task;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
 import java.util.List;
 
 @ApplicationScoped
 public class TaskDAO {
 
-    @PersistenceContext(unitName = "tasksPU")
+    private EntityManagerFactory emf;
     private EntityManager entityManager;
 
+    @PostConstruct
+    public void init() {
+        emf = Persistence.createEntityManagerFactory("tasksPU");
+        entityManager = emf.createEntityManager();
+    }
+
     public void save(Task task) {
+        entityManager.getTransaction().begin();
         entityManager.persist(task);
+        entityManager.getTransaction().commit();
     }
 
     public void update(Task task) {
+        entityManager.getTransaction().begin();
         entityManager.merge(task);
+        entityManager.getTransaction().commit();
     }
 
     public void delete(Task task) {
+        entityManager.getTransaction().begin();
         Task managed = entityManager.merge(task);
         entityManager.remove(managed);
+        entityManager.getTransaction().commit();
     }
 
     public Task findById(int id) {
@@ -48,8 +62,10 @@ public class TaskDAO {
     }
 
     public void deleteCompleted() {
+        entityManager.getTransaction().begin();
         entityManager.createQuery("DELETE FROM Task t WHERE t.status = :status")
                 .setParameter("status", Task.Status.COMPLETE)
                 .executeUpdate();
+        entityManager.getTransaction().commit();
     }
 }
