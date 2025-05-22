@@ -10,7 +10,7 @@ import java.util.List;
 @ApplicationScoped
 public class TaskDAO {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "tasksPU")
     private EntityManager entityManager;
 
     public void save(Task task) {
