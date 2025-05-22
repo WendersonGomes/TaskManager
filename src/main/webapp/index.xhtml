@@ -22,25 +22,45 @@
          padding: 30px;
          border-radius: 12px;
          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-         width: 400px;
+         width: 500px;
+      }
+
+      .form-grid {
+         display: grid;
+         grid-template-columns: 1fr 1fr;
+         gap: 20px;
+         margin-bottom: 20px;
       }
 
       .form-group {
-         margin-bottom: 15px;
+         display: flex;
+         flex-direction: column;
       }
 
       label {
-         display: block;
          font-weight: 600;
          margin-bottom: 5px;
       }
 
-      input, textarea, select {
+      input, select, textarea {
          width: 100%;
          padding: 8px;
          border: 1px solid #ccc;
-         border-radius: 8px;
+         background-color: #f8fafc;
+         border-radius: 6px;
          box-sizing: border-box;
+      }
+
+      textarea {
+         resize: none;
+         max-height: 100px;
+         overflow-y: auto;
+      }
+
+      .btn-group {
+         display: flex;
+         justify-content: space-between;
+         gap: 10px;
       }
 
       .btn {
@@ -50,7 +70,8 @@
          border: none;
          border-radius: 8px;
          cursor: pointer;
-         width: 100%;
+         flex: 1;
+         transition: background-color 0.3s;
       }
 
       .btn:hover {
@@ -62,58 +83,68 @@
          margin-bottom: 25px;
          color: #333;
       }
+
+      .full-width {
+         grid-column: span 2;
+      }
    </style>
 </h:head>
 
 <h:body>
-
    <h:form>
       <div class="container">
          <h2>Cadastrar Tarefa</h2>
 
-         <div class="form-group">
-            <label for="title">Título:</label>
-            <h:inputText id="title" value="#{taskBean.task.title}" required="true" requiredMessage="O titulo é obrigatório"/>
-            <h:message for="title" style="color:red"/>
+         <div class="form-grid">
+            <!-- Título -->
+            <div class="form-group">
+               <label for="title">Título:</label>
+               <h:inputText id="title" value="#{taskBean.task.title}" required="true" requiredMessage="O título é obrigatório"/>
+               <h:message for="title" style="color:red"/>
+            </div>
+
+            <!-- Prazo -->
+            <div class="form-group">
+               <label for="deadline">Prazo:</label>
+               <h:inputText id="deadline" value="#{taskBean.task.deadLine}" required="true" requiredMessage="O prazo é obrigatório">
+                  <f:converter converterId="localDateConverter" />
+               </h:inputText>
+               <h:message for="deadline" style="color:red"/>
+            </div>
+
+            <!-- Responsável -->
+            <div class="form-group">
+               <label for="responsible">Responsável:</label>
+               <h:selectOneMenu id="responsible" value="#{taskBean.task.responsible}" required="true" requiredMessage="O responsável é obrigatório">
+                  <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
+                  <f:selectItems value="#{taskBean.responsibleList}" var="r" itemLabel="#{r}" itemValue="#{r}"/>
+               </h:selectOneMenu>
+               <h:message for="responsible" style="color:red"/>
+            </div>
+
+            <!-- Prioridade -->
+            <div class="form-group">
+               <label for="priority">Prioridade:</label>
+               <h:selectOneMenu id="priority" value="#{taskBean.task.priority}" required="true" requiredMessage="A prioridade é obrigatória">
+                  <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
+                  <f:selectItems value="#{taskBean.priorities}" var="p" itemLabel="#{p}" itemValue="#{p}"/>
+               </h:selectOneMenu>
+               <h:message for="priority" style="color:red"/>
+            </div>
+
+            <!-- Descrição (ocupa a largura total) -->
+            <div class="form-group full-width">
+               <label for="description">Descrição:</label>
+               <h:inputTextarea id="description" value="#{taskBean.task.description}" required="true"
+                                requiredMessage="A descrição é obrigatória"
+                                rows="4" style="height: 100px;"/>
+               <h:message for="description" style="color:red"/>
+            </div>
          </div>
 
-         <div class="form-group">
-            <label for="description">Descrição:</label>
-            <h:inputTextarea id="description" value="#{taskBean.task.description}" required="true" requiredMessage="A descrição é obrigatório" rows="3"/>
-            <h:message for="description" style="color:red"/>
-         </div>
-
-         <div class="form-group">
-            <label for="responsible">Responsável:</label>
-            <h:selectOneMenu id="responsible" value="#{taskBean.task.responsible}" required="true" requiredMessage="O responsável é obrigatório">
-               <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
-               <f:selectItems value="#{taskBean.responsibleList}" var="r" itemLabel="#{r}" itemValue="#{r}"/>
-            </h:selectOneMenu>
-            <h:message for="responsible" style="color:red"/>
-         </div>
-
-         <div class="form-group">
-            <label for="priority">Prioridade:</label>
-            <h:selectOneMenu id="priority" value="#{taskBean.task.priority}" required="true" requiredMessage="A prioridade é obrigatório">
-               <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
-               <f:selectItems value="#{taskBean.priorities}" var="p" itemLabel="#{p}" itemValue="#{p}"/>
-            </h:selectOneMenu>
-            <h:message for="priority" style="color:red"/>
-         </div>
-
-         <div class="form-group">
-            <h:outputLabel for="deadline" value="Prazo:" />
-            <h:inputText id="deadline" value="#{taskBean.task.deadLine}" required="true" requiredMessage="O prazo é obrigatório">
-               <f:converter converterId="localDateConverter" />
-            </h:inputText>
-            <h:message for="deadline" style="color:red"/>
-
-         </div>
-
-         <div class="form-group">
+         <!-- Botões -->
+         <div class="btn-group">
             <h:commandButton styleClass="btn" value="#{taskBean.editing ? 'Atualizar' : 'Cadastrar'}" action="#{taskBean.save}"/>
-         </div>
-         <div>
             <h:commandButton styleClass="btn" value="Lista de cadastros" action="#{taskBean.resetFormAndRedirectToTaskListPage}" immediate="true"/>
          </div>
       </div>
