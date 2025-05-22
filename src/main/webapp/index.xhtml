@@ -106,11 +106,16 @@
             <!-- Prazo -->
             <div class="form-group">
                <label for="deadline">Prazo:</label>
-               <h:inputText id="deadline" value="#{taskBean.task.deadLine}" required="true" requiredMessage="O prazo é obrigatório">
-                  <f:converter converterId="localDateConverter" />
+               <h:inputText id="deadline"
+                            value="#{taskBean.task.deadLine}"
+                            required="true"
+                            requiredMessage="O prazo é obrigatório"
+                            converter="localDateConverter">
+                  <f:validator validatorId="dateNotPastValidator"/>
                </h:inputText>
                <h:message for="deadline" style="color:red"/>
             </div>
+
 
             <!-- Responsável -->
             <div class="form-group">
