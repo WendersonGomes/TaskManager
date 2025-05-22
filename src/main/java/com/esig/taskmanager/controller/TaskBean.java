@@ -2,6 +2,7 @@ package com.esig.taskmanager.controller;
 
 import com.esig.taskmanager.model.Task;
 import com.esig.taskmanager.service.TaskService;
+import jakarta.annotation.ManagedBean;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Named
+@Named("taskBean")
 @ViewScoped
 public class TaskBean implements Serializable {
 
