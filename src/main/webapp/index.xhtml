@@ -1,11 +1,122 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
-   <f:view>
-      <h:outputLabel value="Hello, world"/>
-   </f:view>
+
+<h:head>
+   <title>Cadastrar Tarefa</title>
+   <style>
+      body {
+         margin: 0;
+         padding: 0;
+         font-family: sans-serif;
+         background: #f2f4f7;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         height: 100vh;
+      }
+
+      .container {
+         background: #fff;
+         padding: 30px;
+         border-radius: 12px;
+         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+         width: 400px;
+      }
+
+      .form-group {
+         margin-bottom: 15px;
+      }
+
+      label {
+         display: block;
+         font-weight: 600;
+         margin-bottom: 5px;
+      }
+
+      input, textarea, select {
+         width: 100%;
+         padding: 8px;
+         border: 1px solid #ccc;
+         border-radius: 8px;
+         box-sizing: border-box;
+      }
+
+      .btn {
+         background: #1976d2;
+         color: white;
+         padding: 10px 15px;
+         border: none;
+         border-radius: 8px;
+         cursor: pointer;
+         width: 100%;
+      }
+
+      .btn:hover {
+         background: #115293;
+      }
+
+      h2 {
+         text-align: center;
+         margin-bottom: 25px;
+         color: #333;
+      }
+   </style>
+</h:head>
+
+<h:body>
+
+   <h:form>
+      <div class="container">
+         <h2>Cadastrar Tarefa</h2>
+
+         <div class="form-group">
+            <label for="title">Título:</label>
+            <h:inputText id="title" value="#{taskBean.task.title}" required="true" requiredMessage="O titulo é obrigatório"/>
+            <h:message for="title" style="color:red"/>
+         </div>
+
+         <div class="form-group">
+            <label for="description">Descrição:</label>
+            <h:inputTextarea id="description" value="#{taskBean.task.description}" required="true" requiredMessage="A descrição é obrigatório" rows="3"/>
+            <h:message for="description" style="color:red"/>
+         </div>
+
+         <div class="form-group">
+            <label for="responsible">Responsável:</label>
+            <h:selectOneMenu id="responsible" value="#{taskBean.task.responsible}" required="true" requiredMessage="O responsável é obrigatório">
+               <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
+               <f:selectItems value="#{taskBean.responsibleList}" var="r" itemLabel="#{r}" itemValue="#{r}"/>
+            </h:selectOneMenu>
+            <h:message for="responsible" style="color:red"/>
+         </div>
+
+         <div class="form-group">
+            <label for="priority">Prioridade:</label>
+            <h:selectOneMenu id="priority" value="#{taskBean.task.priority}" required="true" requiredMessage="A prioridade é obrigatório">
+               <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
+               <f:selectItems value="#{taskBean.priorities}" var="p" itemLabel="#{p}" itemValue="#{p}"/>
+            </h:selectOneMenu>
+            <h:message for="priority" style="color:red"/>
+         </div>
+
+         <div class="form-group">
+            <h:outputLabel for="deadline" value="Prazo:" />
+            <h:inputText id="deadline" value="#{taskBean.task.deadLine}" required="true" requiredMessage="O prazo é obrigatório">
+               <f:converter converterId="localDateConverter" />
+            </h:inputText>
+            <h:message for="deadline" style="color:red"/>
+
+         </div>
+
+         <div class="form-group">
+            <h:commandButton styleClass="btn" value="#{taskBean.editing ? 'Atualizar' : 'Cadastrar'}" action="#{taskBean.save}"/>
+         </div>
+         <div>
+            <h:commandButton styleClass="btn" value="Lista de cadastros" action="#{taskBean.resetFormAndRedirectToTaskListPage}" immediate="true"/>
+         </div>
+      </div>
+   </h:form>
+</h:body>
 </html>
