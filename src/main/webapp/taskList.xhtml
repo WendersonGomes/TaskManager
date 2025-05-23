@@ -5,6 +5,7 @@
 
 <h:head>
     <title>Listagem de Tarefas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -92,6 +93,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+            justify-content: center;
         }
 
         .actions a {
@@ -144,11 +146,14 @@
     <div class="container">
         <h:form id="filterForm">
             <h2>Listagem de Tarefas</h2>
+            <h:messages globalOnly="true" style="color:red;" />
 
             <div class="filter-grid">
                 <div>
                     <label for="filterNumber">Número:</label>
-                    <h:inputText id="filterNumber" value="#{taskBean.filterId}" />
+                    <h:inputText id="filterNumber" value="#{taskBean.filterId}" converterMessage="Por favor, insira apenas números">
+                    </h:inputText>
+                    <h:message for="filterNumber" style="color:red"/>
                 </div>
                 <div>
                     <label for="filterTitle">Título:</label>
@@ -218,9 +223,8 @@
                             |
                             <h:commandLink value="Concluir" action="#{taskBean.completeTask(t)}"
                                            onclick="return confirm('Tem certeza que deseja concluir a tarefa?')" />
-
+                            |
                         </h:panelGroup>
-                        |
                         <h:commandLink value="Excluir" action="#{taskBean.deleteTask(t)}"
                                        onclick="return confirm('Tem certeza que deseja excluir a tarefa?')" />
                     </div>
