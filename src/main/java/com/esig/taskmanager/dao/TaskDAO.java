@@ -7,6 +7,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+
 import java.util.List;
 
 @ApplicationScoped
@@ -22,22 +23,53 @@ public class TaskDAO {
     }
 
     public void save(Task task) {
-        entityManager.getTransaction().begin();
-        entityManager.persist(task);
-        entityManager.getTransaction().commit();
+        try {
+            beginTransaction();
+            if (task.getId() == 0) {
+                entityManager.persist(task);
+            } else {
+                entityManager.merge(task); // evita conflito de ID existente
+            }
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+            throw e;
+        }
     }
 
     public void update(Task task) {
-        entityManager.getTransaction().begin();
-        entityManager.merge(task);
-        entityManager.getTransaction().commit();
+        try {
+            beginTransaction();
+            entityManager.merge(task);
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+            throw e;
+        }
     }
 
     public void delete(Task task) {
-        entityManager.getTransaction().begin();
-        Task managed = entityManager.merge(task);
-        entityManager.remove(managed);
-        entityManager.getTransaction().commit();
+        try {
+            beginTransaction();
+            Task managed = entityManager.merge(task);
+            entityManager.remove(managed);
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+            throw e;
+        }
+    }
+
+    public void deleteAll() {
+        try {
+            beginTransaction();
+            entityManager.createQuery("DELETE FROM Task").executeUpdate();
+            // entityManager.createNativeQuery("ALTER SEQUENCE public.task_id_seq RESTART WITH 1").executeUpdate();
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+            throw e;
+        }
     }
 
     public Task findById(int id) {
@@ -64,19 +96,47 @@ public class TaskDAO {
     }
 
     public void deleteCompleted() {
-        entityManager.getTransaction().begin();
-        entityManager.createQuery("DELETE FROM Task t WHERE t.status = :status")
-                .setParameter("status", Task.Status.COMPLETE)
-                .executeUpdate();
-        entityManager.getTransaction().commit();
+        try {
+            beginTransaction();
+            entityManager.createQuery("DELETE FROM Task t WHERE t.status = :status")
+                    .setParameter("status", Task.Status.COMPLETE)
+                    .executeUpdate();
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+            throw e;
+        }
     }
 
     public void deleteProgress() {
-        entityManager.getTransaction().begin();
-        entityManager.createQuery("DELETE FROM Task t WHERE t.status = :status")
-                .setParameter("status", Task.Status.PROGRESS)
-                .executeUpdate();
-        entityManager.getTransaction().commit();
+        try {
+            beginTransaction();
+            entityManager.createQuery("DELETE FROM Task t WHERE t.status = :status")
+                    .setParameter("status", Task.Status.PROGRESS)
+                    .executeUpdate();
+            commitTransaction();
+        } catch (Exception e) {
+            rollbackTransaction();
+            throw e;
+        }
+    }
+
+    private void beginTransaction() {
+        if (!entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().begin();
+        }
+    }
+
+    private void commitTransaction() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().commit();
+        }
+    }
+
+    private void rollbackTransaction() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @PreDestroy
