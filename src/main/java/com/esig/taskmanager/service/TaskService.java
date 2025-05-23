@@ -5,6 +5,8 @@ import com.esig.taskmanager.model.Task;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 
 @Named
@@ -14,14 +16,17 @@ public class TaskService {
     @Inject
     private TaskDAO taskDAO;
 
+    @Transactional
     public void save(Task task) {
         taskDAO.save(task);
     }
 
+    @Transactional
     public void update(Task task) {
         taskDAO.update(task);
     }
 
+    @Transactional
     public void delete(Task task) {
         taskDAO.delete(task);
     }
@@ -38,7 +43,13 @@ public class TaskService {
         return taskDAO.filter(title, responsible, description, status);
     }
 
+    @Transactional
     public void deleteCompleted() {
         taskDAO.deleteCompleted();
+    }
+
+    @Transactional
+    public void deleteProgress() {
+        taskDAO.deleteProgress();
     }
 }
