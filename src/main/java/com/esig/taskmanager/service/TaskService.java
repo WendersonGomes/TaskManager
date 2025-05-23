@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.transaction.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Named
@@ -18,11 +19,14 @@ public class TaskService {
 
     @Transactional
     public void save(Task task) {
+        isInvalidTask(task);
+        task.setStatus(Task.Status.PROGRESS);
         taskDAO.save(task);
     }
 
     @Transactional
     public void update(Task task) {
+        task.setStatus(Task.Status.COMPLETE);
         taskDAO.update(task);
     }
 
@@ -39,8 +43,21 @@ public class TaskService {
         return taskDAO.findAll();
     }
 
-    public List<Task> filter(String title, String responsible, String description, Task.Status status) {
-        return taskDAO.filter(title, responsible, description, status);
+    public List<Task> filter(Integer id, String title, String responsible, String description, Task.Status status) {
+        if (id != null) {
+            Task result = taskDAO.findById(id);
+            return result != null ? List.of(result) : Collections.emptyList();
+        } else {
+            return taskDAO.filter(title, responsible, description, status);
+        }
+    }
+
+    public boolean isInvalidTask(Task t) {
+        return t == null ||
+                t.getTitle() == null || t.getTitle().isBlank() ||
+                t.getDescription() == null || t.getDescription().isBlank() ||
+                t.getResponsible() == null || t.getResponsible().isBlank() ||
+                t.getPriority() == null || t.getDeadLine() == null;
     }
 
     @Transactional
@@ -51,5 +68,9 @@ public class TaskService {
     @Transactional
     public void deleteProgress() {
         taskDAO.deleteProgress();
+    }
+
+    public void deleteAll() {
+        taskDAO.deleteAll();
     }
 }
