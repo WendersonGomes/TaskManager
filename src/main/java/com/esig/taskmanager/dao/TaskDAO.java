@@ -2,11 +2,11 @@ package com.esig.taskmanager.dao;
 
 import com.esig.taskmanager.model.Task;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-
 import java.util.List;
 
 @ApplicationScoped
@@ -52,7 +52,7 @@ public class TaskDAO {
         String jpql = "SELECT t FROM Task t WHERE " +
                 "(:title IS NULL OR t.title LIKE :title) AND " +
                 "(:responsible IS NULL OR t.responsible LIKE :responsible) AND " +
-                "(:description IS NULL OR t.title LIKE :description OR t.description LIKE :description) AND " +
+                "(:description IS NULL OR t.description LIKE :description) AND " +
                 "(:status IS NULL OR t.status = :status)";
 
         return entityManager.createQuery(jpql, Task.class)
@@ -63,13 +63,29 @@ public class TaskDAO {
                 .getResultList();
     }
 
-
-
     public void deleteCompleted() {
         entityManager.getTransaction().begin();
         entityManager.createQuery("DELETE FROM Task t WHERE t.status = :status")
                 .setParameter("status", Task.Status.COMPLETE)
                 .executeUpdate();
         entityManager.getTransaction().commit();
+    }
+
+    public void deleteProgress() {
+        entityManager.getTransaction().begin();
+        entityManager.createQuery("DELETE FROM Task t WHERE t.status = :status")
+                .setParameter("status", Task.Status.PROGRESS)
+                .executeUpdate();
+        entityManager.getTransaction().commit();
+    }
+
+    @PreDestroy
+    public void close() {
+        if (entityManager != null && entityManager.isOpen()) {
+            entityManager.close();
+        }
+        if (emf != null && emf.isOpen()) {
+            emf.close();
+        }
     }
 }
