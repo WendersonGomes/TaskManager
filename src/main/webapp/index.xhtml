@@ -81,7 +81,6 @@
       h2 {
          text-align: center;
          margin-bottom: 25px;
-         color: #333;
       }
 
       .full-width {
@@ -96,14 +95,20 @@
          <h2>Cadastrar Tarefa</h2>
 
          <div class="form-grid">
-            <!-- Título -->
             <div class="form-group">
                <label for="title">Título:</label>
-               <h:inputText id="title" value="#{taskBean.task.title}" required="true" requiredMessage="O título é obrigatório"/>
+               <h:inputText id="title"
+                            value="#{taskBean.task.title}"
+                            required="true"
+                            requiredMessage="O título é obrigatório"
+                            validatorMessage="O título não pode ultrapassar 50 caracteres"
+                            maxlength="50">
+                  <f:validateLength maximum="50"/>
+               </h:inputText>
                <h:message for="title" style="color:red"/>
+
             </div>
 
-            <!-- Prazo -->
             <div class="form-group">
                <label for="deadline">Prazo:</label>
                <h:inputText id="deadline"
@@ -116,8 +121,6 @@
                <h:message for="deadline" style="color:red"/>
             </div>
 
-
-            <!-- Responsável -->
             <div class="form-group">
                <label for="responsible">Responsável:</label>
                <h:selectOneMenu id="responsible" value="#{taskBean.task.responsible}" required="true" requiredMessage="O responsável é obrigatório">
@@ -127,7 +130,6 @@
                <h:message for="responsible" style="color:red"/>
             </div>
 
-            <!-- Prioridade -->
             <div class="form-group">
                <label for="priority">Prioridade:</label>
                <h:selectOneMenu id="priority" value="#{taskBean.task.priority}" required="true" requiredMessage="A prioridade é obrigatória">
@@ -137,20 +139,24 @@
                <h:message for="priority" style="color:red"/>
             </div>
 
-            <!-- Descrição (ocupa a largura total) -->
             <div class="form-group full-width">
                <label for="description">Descrição:</label>
-               <h:inputTextarea id="description" value="#{taskBean.task.description}" required="true"
+               <h:inputTextarea id="description"
+                                value="#{taskBean.task.description}"
+                                required="true"
                                 requiredMessage="A descrição é obrigatória"
-                                rows="4" style="height: 100px;"/>
+                                validatorMessage="A descrição não pode ultrapassar 255 caracteres"
+                                maxlength="255"
+                                rows="4" style="height: 100px;">
+                  <f:validateLength maximum="255"/>
+               </h:inputTextarea>
                <h:message for="description" style="color:red"/>
             </div>
          </div>
 
-         <!-- Botões -->
          <div class="btn-group">
-            <h:commandButton styleClass="btn" value="#{taskBean.editing ? 'Atualizar' : 'Cadastrar'}" action="#{taskBean.save}"/>
             <h:commandButton styleClass="btn" value="Lista de cadastros" action="#{taskBean.resetFormAndRedirectToTaskListPage}" immediate="true"/>
+            <h:commandButton styleClass="btn" value="#{taskBean.editing ? 'Atualizar' : 'Cadastrar'}" action="#{taskBean.save}"/>
          </div>
       </div>
    </h:form>

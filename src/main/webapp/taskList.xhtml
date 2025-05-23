@@ -23,7 +23,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 128, 0.1);
         }
 
-        h3 {
+        h2 {
             text-align: center;
             margin-bottom: 30px;
         }
@@ -88,6 +88,12 @@
             color: #1e3a8a;
         }
 
+        .actions {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
         .actions a {
             margin: 0 6px;
             color: #1e3a8a;
@@ -97,13 +103,47 @@
         .actions a:hover {
             text-decoration: underline;
         }
+
+        @media (max-width: 1000px) {
+            .filter-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            table, th, td {
+                font-size: 14px;
+                word-break: break-word;
+            }
+
+            .actions {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .actions a {
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
+        }
+
     </style>
 </h:head>
 
 <h:body>
     <div class="container">
         <h:form id="filterForm">
-            <h3>Listagem de Tarefas</h3>
+            <h2>Listagem de Tarefas</h2>
 
             <div class="filter-grid">
                 <div>
@@ -130,16 +170,18 @@
                     <label for="filterStatus">Situação:</label>
                     <h:selectOneMenu id="filterStatus" value="#{taskBean.filterStatus}">
                         <f:selectItem itemLabel="Todos" itemValue="" noSelectionOption="true" />
-                        <f:selectItems value="#{taskBean.statusList}" var="s" itemLabel="#{s}" itemValue="#{s}" />
+                        <f:selectItems value="#{taskBean.statusList}" var="s" itemLabel="#{s.labelInPTBR}" itemValue="#{s}" />
                     </h:selectOneMenu>
                 </div>
             </div>
 
             <div class="button-group">
-                <h:commandButton value="Buscar Tarefas" action="#{taskBean.applyFilter}" styleClass="btn" />
+                <h:commandButton value="Limpar filtros" action="#{taskBean.clearFilters()}" styleClass="btn" />
+                <h:commandButton value="Limpar Concluídas" action="#{taskBean.clearCompletedTasks}" styleClass="btn" onclick="return confirm('Tem certeza que deseja remover todas as tarefas concluídas?')" />
+                <h:commandButton value="Limpar Em Andamento" action="#{taskBean.clearProgressTasks}" styleClass="btn" onclick="return confirm('Tem certeza que deseja remover todas as tarefas em andamento?')" />
+                <h:commandButton value="Limpar Todas As Tarefas" action="#{taskBean.clearAllTasks}" styleClass="btn" onclick="return confirm('Tem certeza que deseja remover todas as tarefas?')" />
                 <h:commandButton value="Nova Tarefa" action="#{taskBean.prepareCreate()}" styleClass="btn" />
-                <h:commandButton value="Limpar Concluídas" action="#{taskBean.clearCompletedTasks}" styleClass="btn" onclick="return confirm('Tem certeza que deseja remover todas as tarefas concluídas?')"
-                />
+                <h:commandButton value="Buscar Tarefas" action="#{taskBean.applyFilter}" styleClass="btn" />
             </div>
         </h:form>
 
@@ -151,18 +193,22 @@
                 </h:column>
                 <h:column>
                     <f:facet name="header">Título</f:facet>
-                    #{t.title}
+                    #{t.title.length() > 16 ? t.title.substring(0, 16).concat('...') : t.title}
                 </h:column>
                 <h:column>
                     <f:facet name="header">Responsável</f:facet>
                     #{t.responsible}
+                </h:column><h:column>
+                    <f:facet name="header">Prioridade</f:facet>
+                    #{t.priority.labelInPTBR}
                 </h:column>
                 <h:column>
                     <f:facet name="header">Situação</f:facet>
-                    #{t.status}
-                </h:column><h:column>
+                    #{t.status.labelInPTBR}
+                </h:column>
+                <h:column>
                     <f:facet name="header">Descrição</f:facet>
-                    #{t.description}
+                    #{t.description.length() > 16 ? t.description.substring(0, 16).concat('...') : t.description}
                 </h:column>
                 <h:column>
                     <f:facet name="header">Ações</f:facet>
@@ -172,9 +218,9 @@
                             |
                             <h:commandLink value="Concluir" action="#{taskBean.completeTask(t)}"
                                            onclick="return confirm('Tem certeza que deseja concluir a tarefa?')" />
-                            |
-                        </h:panelGroup>
 
+                        </h:panelGroup>
+                        |
                         <h:commandLink value="Excluir" action="#{taskBean.deleteTask(t)}"
                                        onclick="return confirm('Tem certeza que deseja excluir a tarefa?')" />
                     </div>
