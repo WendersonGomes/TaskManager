@@ -28,6 +28,7 @@ public class TaskBean implements Serializable {
     private TaskService taskService;
 
     private Task task = new Task();
+    private Integer taskId; // ID da task para edição
     private List<Task> taskList;
     private List<String> responsibleList;
 
@@ -41,6 +42,23 @@ public class TaskBean implements Serializable {
 
     @PostConstruct
     public void init() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        String idParam = facesContext.getExternalContext().getRequestParameterMap().get("id");
+
+        if (idParam != null && !idParam.isBlank()) {
+            try {
+                this.taskId = Integer.parseInt(idParam);
+                this.task = taskService.findById(taskId);
+                this.editing = true;
+            } catch (NumberFormatException e) {
+                this.task = new Task();
+                this.editing = false;
+            }
+        } else {
+            this.task = new Task();
+            this.editing = false;
+        }
+
         refreshTaskList();
         responsibleList = List.of("João", "Maria", "Carlos", "Ana");
     }
@@ -100,10 +118,10 @@ public class TaskBean implements Serializable {
         return "index.xhtml?faces-redirect=true";
     }
 
-    public String prepareEdit(int id) {
-        this.task = taskService.findById(id);
+    public String prepareEdit(Task t) {
+        this.task = t;
         this.editing = true;
-        return "index.xhtml?faces-redirect=true";
+        return "index.xhtml?id=" + t.getId() + "&faces-redirect=true";
     }
 
     public void deleteTask(Task t) {
@@ -112,7 +130,7 @@ public class TaskBean implements Serializable {
     }
 
     public void completeTask(Task t) {
-        taskService.update(t);
+        taskService.completeTask(t);
         refreshTaskList();
     }
 
