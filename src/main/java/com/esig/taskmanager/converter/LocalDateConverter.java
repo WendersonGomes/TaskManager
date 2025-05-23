@@ -6,7 +6,6 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.ConverterException;
 import jakarta.faces.convert.FacesConverter;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -28,11 +27,9 @@ public class LocalDateConverter implements Converter {
         }
     }
 
-
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
         if (value == null) return "";
         return ((LocalDate) value).format(FORMATTER);
     }
-
 }

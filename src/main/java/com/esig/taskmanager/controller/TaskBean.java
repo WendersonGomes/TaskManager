@@ -1,4 +1,3 @@
-// TaskBean.java
 package com.esig.taskmanager.controller;
 
 import com.esig.taskmanager.model.Task;
@@ -14,6 +13,7 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -40,7 +40,7 @@ public class TaskBean implements Serializable {
     @PostConstruct
     public void init() {
         refreshTaskList();
-        responsibleList = List.of("John", "Maria", "Carlos", "Anna");
+        responsibleList = List.of("João", "Maria", "Carlos", "Ana");
     }
 
     public List<Task.Priority> getPriorities() {
@@ -61,7 +61,6 @@ public class TaskBean implements Serializable {
 
     public void createTask() {
         FacesContext context = FacesContext.getCurrentInstance();
-
         try {
             if (isInvalidTask(task)) {
                 context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Todos os campos devem ser preenchidos.", null));
@@ -79,12 +78,12 @@ public class TaskBean implements Serializable {
     }
 
     public void updateTask() {
-        taskService.update(task);
-        resetForm();
         try {
+            taskService.update(task);
+            resetForm();
             FacesContext.getCurrentInstance().getExternalContext().redirect("taskList.xhtml");
         } catch (IOException e) {
-            e.printStackTrace();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao atualizar tarefa: " + e.getMessage(), null));
         }
     }
 
@@ -120,25 +119,50 @@ public class TaskBean implements Serializable {
     public void applyFilter() {
         if (filterId != null) {
             Task result = taskService.findById(filterId);
-            taskList = result != null ? List.of(result) : List.of();
+            taskList = result != null ? List.of(result) : Collections.emptyList();
         } else {
             taskList = taskService.filter(filterTitle, filterResponsible, filterDescription, filterStatus);
         }
     }
 
+    public void clearFilters() {
+        this.filterId = null;
+        this.filterTitle = null;
+        this.filterResponsible = null;
+        this.filterDescription = null;
+        this.filterStatus = null;
+        refreshTaskList();
+    }
+
     public void clearCompletedTasks() {
         taskService.deleteCompleted();
         refreshTaskList();
-
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Tarefas concluídas removidas com sucesso.", null));
     }
 
+    public void clearProgressTasks() {
+        taskService.deleteProgress();
+        refreshTaskList();
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Tarefas em andamento removidas com sucesso.", null));
+    }
+
+    public void clearAllTasks() {
+        for (Task t : taskService.findAll()) {
+            taskService.delete(t);
+        }
+        refreshTaskList();
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Todas as tarefas foram removidas.", null));
+    }
+
     private boolean isInvalidTask(Task t) {
-        return t.getTitle() == null || t.getTitle().isBlank()
-                || t.getDescription() == null || t.getDescription().isBlank()
-                || t.getResponsible() == null || t.getResponsible().isBlank()
-                || t.getPriority() == null || t.getDeadLine() == null;
+        return t == null ||
+                t.getTitle() == null || t.getTitle().isBlank() ||
+                t.getDescription() == null || t.getDescription().isBlank() ||
+                t.getResponsible() == null || t.getResponsible().isBlank() ||
+                t.getPriority() == null || t.getDeadLine() == null;
     }
 
     private void resetForm() {
@@ -148,16 +172,7 @@ public class TaskBean implements Serializable {
     }
 
     public String resetFormAndRedirectToTaskListPage() {
-        // Limpa os filtros ou qualquer outra informação
-        this.filterId = null;
-        this.filterTitle = null;
-        this.filterResponsible = null;
-        this.filterStatus = null;
-
-        // Recarrega a lista se necessário
-        refreshTaskList();
-
-        // Redireciona para a própria página
+        clearFilters();
         return "taskList.xhtml?faces-redirect=true";
     }
 
