@@ -98,12 +98,7 @@
             <div class="form-group">
                <label for="title">Título:</label>
                <h:inputText id="title"
-                            value="#{taskBean.task.title}"
-                            required="true"
-                            requiredMessage="O título é obrigatório"
-                            validatorMessage="O título não pode ultrapassar 50 caracteres"
-                            maxlength="50">
-                  <f:validateLength maximum="50"/>
+                            value="#{taskBean.task.title}">
                </h:inputText>
                <h:message for="title" style="color:red"/>
 
@@ -113,8 +108,6 @@
                <label for="deadline">Prazo:</label>
                <h:inputText id="deadline"
                             value="#{taskBean.task.deadLine}"
-                            required="true"
-                            requiredMessage="O prazo é obrigatório"
                             converter="localDateConverter">
                   <f:validator validatorId="dateNotPastValidator"/>
                </h:inputText>
@@ -123,7 +116,7 @@
 
             <div class="form-group">
                <label for="responsible">Responsável:</label>
-               <h:selectOneMenu id="responsible" value="#{taskBean.task.responsible}" required="true" requiredMessage="O responsável é obrigatório">
+               <h:selectOneMenu id="responsible" value="#{taskBean.task.responsible}">
                   <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
                   <f:selectItems value="#{taskBean.responsibleList}" var="r" itemLabel="#{r}" itemValue="#{r}"/>
                </h:selectOneMenu>
@@ -143,12 +136,8 @@
                <label for="description">Descrição:</label>
                <h:inputTextarea id="description"
                                 value="#{taskBean.task.description}"
-                                required="true"
-                                requiredMessage="A descrição é obrigatória"
-                                validatorMessage="A descrição não pode ultrapassar 255 caracteres"
-                                maxlength="255"
                                 rows="4" style="height: 100px;">
-                  <f:validateLength maximum="255"/>
+
                </h:inputTextarea>
                <h:message for="description" style="color:red"/>
             </div>
