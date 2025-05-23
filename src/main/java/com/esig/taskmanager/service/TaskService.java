@@ -26,6 +26,11 @@ public class TaskService {
 
     @Transactional
     public void update(Task task) {
+        taskDAO.update(task);
+    }
+
+    @Transactional
+    public void completeTask(Task task) {
         task.setStatus(Task.Status.COMPLETE);
         taskDAO.update(task);
     }
