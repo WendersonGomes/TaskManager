@@ -24,9 +24,34 @@ public class Task {
 
     public enum Priority {
         LOW, MEDIUM, HIGH;
+
+        public String getLabelInPTBR() {
+            switch (this) {
+                case LOW:
+                    return "Baixa";
+                case MEDIUM:
+                    return "Média";
+                case HIGH:
+                    return "Alta";
+                default:
+                    return "Desconhecido";
+            }
+        }
     }
+
 
     public enum Status {
         PROGRESS, COMPLETE;
+
+        public String getLabelInPTBR() {
+            switch (this) {
+                case PROGRESS:
+                    return "Em andamento";
+                case COMPLETE:
+                    return "Concluída";
+                default:
+                    return "Desconhecido";
+            }
+        }
     }
 }
