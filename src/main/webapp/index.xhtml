@@ -144,8 +144,16 @@
          </div>
 
          <div class="btn-group">
-            <h:commandButton styleClass="btn" value="Lista de cadastros" action="#{taskBean.resetFormAndRedirectToTaskListPage}" immediate="true"/>
-            <h:commandButton styleClass="btn" value="#{taskBean.editing ? 'Atualizar' : 'Cadastrar'}" action="#{taskBean.save}"/>
+            <h:panelGroup rendered="#{!taskBean.editing}">
+               <h:commandButton value="Voltar para lista" action="#{taskBean.resetFormAndRedirectToTaskListPage}" immediate="true" styleClass="btn" />
+               <h:commandButton value="Cadastrar" action="#{taskBean.save}" styleClass="btn" />
+
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{taskBean.editing}">
+               <h:commandButton value="Cancelar" action="#{taskBean.resetFormAndRedirectToTaskListPage}" immediate="true" styleClass="btn" />
+               <h:commandButton value="Salvar" action="#{taskBean.save}" styleClass="btn" />
+            </h:panelGroup>
          </div>
       </div>
    </h:form>
