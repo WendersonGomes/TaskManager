@@ -219,7 +219,9 @@
                     <f:facet name="header">Ações</f:facet>
                     <div class="actions">
                         <h:panelGroup rendered="#{t.status != 'COMPLETE'}">
-                            <h:commandLink value="Editar" action="#{taskBean.editTask(t)}" />
+                            <h:commandLink value="Editar" action="#{taskBean.prepareEdit(t)}">
+                                <f:param name="id" value="#{t.id}" />
+                            </h:commandLink>
                             |
                             <h:commandLink value="Concluir" action="#{taskBean.completeTask(t)}"
                                            onclick="return confirm('Tem certeza que deseja concluir a tarefa?')" />
