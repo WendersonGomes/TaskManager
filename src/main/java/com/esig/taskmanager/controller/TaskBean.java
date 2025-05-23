@@ -4,6 +4,8 @@ import com.esig.taskmanager.model.Task;
 import com.esig.taskmanager.service.TaskService;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIInput;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -29,7 +31,7 @@ public class TaskBean implements Serializable {
     private List<Task> taskList;
     private List<String> responsibleList;
 
-    private Integer filterId;
+    private String filterId;
     private String filterTitle;
     private String filterResponsible;
     private String filterDescription;
@@ -62,12 +64,11 @@ public class TaskBean implements Serializable {
     public void createTask() {
         FacesContext context = FacesContext.getCurrentInstance();
         try {
-            if (isInvalidTask(task)) {
+            if (taskService.isInvalidTask(task)) {
                 context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Todos os campos devem ser preenchidos.", null));
                 return;
             }
 
-            task.setStatus(Task.Status.PROGRESS);
             taskService.save(task);
 
             context.getExternalContext().redirect("taskList.xhtml");
@@ -111,19 +112,34 @@ public class TaskBean implements Serializable {
     }
 
     public void completeTask(Task t) {
-        t.setStatus(Task.Status.COMPLETE);
         taskService.update(t);
         refreshTaskList();
     }
 
     public void applyFilter() {
-        if (filterId != null) {
-            Task result = taskService.findById(filterId);
-            taskList = result != null ? List.of(result) : Collections.emptyList();
-        } else {
-            taskList = taskService.filter(filterTitle, filterResponsible, filterDescription, filterStatus);
+        FacesContext context = FacesContext.getCurrentInstance();
+        Integer numericFilterId = null;
+
+        if (filterId != null && !filterId.trim().isEmpty()) {
+            try {
+                String digitsOnly = filterId.replaceAll("\\D", "");
+                if (!digitsOnly.isEmpty()) {
+                    numericFilterId = Integer.parseInt(digitsOnly);
+                } else {
+                    // Se digitou algo mas não tinha números
+                    context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "O campo 'Número' deve conter apenas números.", null));
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Número inválido.", null));
+                return;
+            }
         }
+
+        // Aplica filtro normalmente
+        this.taskList = taskService.filter(numericFilterId, filterTitle, filterResponsible, filterDescription, filterStatus);
     }
+
 
     public void clearFilters() {
         this.filterId = null;
@@ -131,6 +147,7 @@ public class TaskBean implements Serializable {
         this.filterResponsible = null;
         this.filterDescription = null;
         this.filterStatus = null;
+
         refreshTaskList();
     }
 
@@ -149,20 +166,10 @@ public class TaskBean implements Serializable {
     }
 
     public void clearAllTasks() {
-        for (Task t : taskService.findAll()) {
-            taskService.delete(t);
-        }
+        taskService.deleteAll();
         refreshTaskList();
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Todas as tarefas foram removidas.", null));
-    }
-
-    private boolean isInvalidTask(Task t) {
-        return t == null ||
-                t.getTitle() == null || t.getTitle().isBlank() ||
-                t.getDescription() == null || t.getDescription().isBlank() ||
-                t.getResponsible() == null || t.getResponsible().isBlank() ||
-                t.getPriority() == null || t.getDeadLine() == null;
     }
 
     private void resetForm() {
