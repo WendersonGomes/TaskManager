@@ -132,7 +132,7 @@
                <label for="priority">Prioridade:</label>
                <h:selectOneMenu id="priority" value="#{taskBean.task.priority}" required="true" requiredMessage="A prioridade é obrigatória">
                   <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
-                  <f:selectItems value="#{taskBean.priorities}" var="p" itemLabel="#{p}" itemValue="#{p}"/>
+                  <f:selectItems value="#{taskBean.priorities}" var="p" itemLabel="#{p.labelInPTBR}" itemValue="#{p}"/>
                </h:selectOneMenu>
                <h:message for="priority" style="color:red"/>
             </div>
