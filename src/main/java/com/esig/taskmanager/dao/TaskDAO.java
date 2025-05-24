@@ -7,7 +7,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-
 import java.util.List;
 
 @ApplicationScoped
@@ -28,7 +27,7 @@ public class TaskDAO {
             if (task.getId() == 0) {
                 entityManager.persist(task);
             } else {
-                entityManager.merge(task); // evita conflito de ID existente
+                entityManager.merge(task);
             }
             commitTransaction();
         } catch (Exception e) {

@@ -4,8 +4,6 @@ import com.esig.taskmanager.model.Task;
 import com.esig.taskmanager.service.TaskService;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
-import jakarta.faces.component.UIComponent;
-import jakarta.faces.component.UIInput;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -15,7 +13,6 @@ import lombok.Setter;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -28,7 +25,7 @@ public class TaskBean implements Serializable {
     private TaskService taskService;
 
     private Task task = new Task();
-    private Integer taskId; // ID da task para edição
+    private Integer taskId;
     private List<Task> taskList;
     private List<String> responsibleList;
 
@@ -60,6 +57,7 @@ public class TaskBean implements Serializable {
         }
 
         refreshTaskList();
+
         responsibleList = List.of("João", "Maria", "Carlos", "Ana");
     }
 
@@ -82,15 +80,11 @@ public class TaskBean implements Serializable {
     public void createTask() {
         FacesContext context = FacesContext.getCurrentInstance();
         try {
-            if (taskService.isInvalidTask(task)) {
-                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Todos os campos devem ser preenchidos.", null));
-                return;
-            }
-
             taskService.save(task);
-
             context.getExternalContext().redirect("taskList.xhtml");
 
+        } catch (IllegalArgumentException e) {
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
         } catch (Exception e) {
             context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao cadastrar tarefa: " + e.getMessage(), null));
         }
@@ -109,12 +103,6 @@ public class TaskBean implements Serializable {
     public String prepareCreate() {
         this.task = new Task();
         this.editing = false;
-        return "index.xhtml?faces-redirect=true";
-    }
-
-    public String editTask(Task t) {
-        this.task = t;
-        this.editing = true;
         return "index.xhtml?faces-redirect=true";
     }
 
@@ -144,7 +132,6 @@ public class TaskBean implements Serializable {
                 if (!digitsOnly.isEmpty()) {
                     numericFilterId = Integer.parseInt(digitsOnly);
                 } else {
-                    // Se digitou algo mas não tinha números
                     context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "O campo 'Número' deve conter apenas números.", null));
                     return;
                 }
@@ -154,7 +141,6 @@ public class TaskBean implements Serializable {
             }
         }
 
-        // Aplica filtro normalmente
         this.taskList = taskService.filter(numericFilterId, filterTitle, filterResponsible, filterDescription, filterStatus);
     }
 
@@ -172,22 +158,16 @@ public class TaskBean implements Serializable {
     public void clearCompletedTasks() {
         taskService.deleteCompleted();
         refreshTaskList();
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Tarefas concluídas removidas com sucesso.", null));
     }
 
     public void clearProgressTasks() {
         taskService.deleteProgress();
         refreshTaskList();
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Tarefas em andamento removidas com sucesso.", null));
     }
 
     public void clearAllTasks() {
         taskService.deleteAll();
         refreshTaskList();
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Todas as tarefas foram removidas.", null));
     }
 
     private void resetForm() {

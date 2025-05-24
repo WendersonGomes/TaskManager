@@ -3,10 +3,11 @@ package com.esig.taskmanager.service;
 import com.esig.taskmanager.dao.TaskDAO;
 import com.esig.taskmanager.model.Task;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.transaction.Transactional;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -19,7 +20,9 @@ public class TaskService {
 
     @Transactional
     public void save(Task task) {
-        isInvalidTask(task);
+        if (isInvalidTask(task)) {
+            throw new IllegalArgumentException("Todos os campos devem ser preenchidos.");
+        }
         task.setStatus(Task.Status.PROGRESS);
         taskDAO.save(task);
     }
