@@ -211,9 +211,13 @@
                     <f:facet name="header">Situação</f:facet>
                     #{t.status.labelInPTBR}
                 </h:column>
-                <h:column>
+                <!-- <h:column>
                     <f:facet name="header">Descrição</f:facet>
                     #{t.description.length() > 16 ? t.description.substring(0, 16).concat('...') : t.description}
+                </h:column> -->
+                <h:column>
+                    <f:facet name="header">Prazo</f:facet>
+                    <h:outputText value="#{t.deadLine}" converter="localDateConverter" />
                 </h:column>
                 <h:column>
                     <f:facet name="header">Ações</f:facet>
@@ -231,7 +235,6 @@
                                        onclick="return confirm('Tem certeza que deseja excluir a tarefa?')" />
                     </div>
                 </h:column>
-
             </h:dataTable>
         </h:form>
     </div>
