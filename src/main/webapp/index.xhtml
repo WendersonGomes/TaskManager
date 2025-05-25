@@ -5,6 +5,7 @@
 
 <h:head>
    <title>Cadastrar Tarefa</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
    <style>
       body {
          margin: 0;
@@ -86,6 +87,36 @@
       .full-width {
          grid-column: span 2;
       }
+
+      @media (max-width: 600px) {
+         body {
+            padding: 10px;
+         }
+
+         .container {
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+         }
+
+         .form-grid {
+            grid-template-columns: 1fr; /* uma coluna só */
+         }
+
+         .btn-group {
+            flex-direction: column;
+         }
+
+         .btn {
+            flex: none;
+            width: 100%;
+         }
+
+         .btn + .btn {
+            margin-top: 10px;
+         }
+      }
+
    </style>
 </h:head>
 
@@ -145,7 +176,7 @@
 
          <div class="btn-group">
             <h:panelGroup rendered="#{!taskBean.editing}">
-               <h:commandButton value="Voltar para lista" action="#{taskBean.resetFormAndRedirectToTaskListPage}" immediate="true" styleClass="btn" />
+               <h:commandButton value="Lista de tarefas" action="#{taskBean.resetFormAndRedirectToTaskListPage}" immediate="true" styleClass="btn" />
                <h:commandButton value="Cadastrar" action="#{taskBean.save}" styleClass="btn" />
 
             </h:panelGroup>
