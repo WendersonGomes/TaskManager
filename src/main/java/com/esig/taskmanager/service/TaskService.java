@@ -3,15 +3,11 @@ package com.esig.taskmanager.service;
 import com.esig.taskmanager.dao.TaskDAO;
 import com.esig.taskmanager.model.Task;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 
-@Named
 @ApplicationScoped
 public class TaskService {
 
@@ -78,6 +74,7 @@ public class TaskService {
         taskDAO.deleteProgress();
     }
 
+    @Transactional
     public void deleteAll() {
         taskDAO.deleteAll();
     }

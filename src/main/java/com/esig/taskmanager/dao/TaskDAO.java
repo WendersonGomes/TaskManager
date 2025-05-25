@@ -63,7 +63,6 @@ public class TaskDAO {
         try {
             beginTransaction();
             entityManager.createQuery("DELETE FROM Task").executeUpdate();
-            // entityManager.createNativeQuery("ALTER SEQUENCE public.task_id_seq RESTART WITH 1").executeUpdate();
             commitTransaction();
         } catch (Exception e) {
             rollbackTransaction();
