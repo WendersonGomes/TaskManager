@@ -1,7 +1,7 @@
 
 # Sistema de Gerenciamento de Tarefas
 
-Aplicação web para **gerenciar tarefas**, utilizando tecnologias da plataforma Java EE (Jakarta EE).
+Aplicação web para **gerenciar tarefas**
 
 ---
 
