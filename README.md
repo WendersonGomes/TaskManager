@@ -1,5 +1,5 @@
 
-# ESIG PROJETO - Sistema de Gerenciamento de Tarefas
+# ESIG Projeto - Sistema de Gerenciamento de Tarefas
 
 Aplicação web para **gerenciar tarefas**
 
